@@ -17,7 +17,7 @@ export function Navbar({ currentScreen, onNavigate, onOpenInspector }: NavbarPro
   }>({
     connected: false,
     geminiConfigured: false,
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3.8-flash',
     mode: 'connecting...',
   });
 
@@ -30,15 +30,15 @@ export function Navbar({ currentScreen, onNavigate, onOpenInspector }: NavbarPro
           setHealth({
             connected: true,
             geminiConfigured: data.gemini?.configured ?? false,
-            model: data.gemini?.model ?? 'gemini-2.5-flash',
-            mode: data.gemini?.mode ?? 'live',
+            model: data.gemini?.model ?? 'gemini-3.8-flash',
+            mode: data.gemini?.mode ?? 'unknown',
           });
         }
       } catch (err) {
         setHealth({
           connected: false,
           geminiConfigured: false,
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.8-flash',
           mode: 'offline',
         });
       }
@@ -74,7 +74,7 @@ export function Navbar({ currentScreen, onNavigate, onOpenInspector }: NavbarPro
           <span className={`w-2 h-2 rounded-full ${health.connected ? 'bg-emerald-400 shadow-sm shadow-emerald-400/80' : 'bg-amber-400'}`} />
           <span className="hidden sm:inline">
             {health.connected 
-              ? (health.geminiConfigured ? 'Gemini 2.5 Live' : 'Backend Connected') 
+              ? (health.geminiConfigured ? `${health.model} Configured` : 'Backend Connected')
               : 'Local Corpus Ready'}
           </span>
         </div>

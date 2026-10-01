@@ -111,6 +111,41 @@ export const GenerationSchema = z.object({
   notes: z.array(z.string()),
 });
 
+export const StoryBeatSchema = z.object({
+  id: z.string().trim().min(1).max(80).regex(/^[a-zA-Z0-9_-]+$/),
+  element_id: z.string().trim().min(1).max(80).nullable(),
+  title: z.string().trim().min(1).max(100),
+  short_text: z.string().trim().min(1).max(240),
+  explanation: z.string().trim().min(1).max(800),
+  duration: z.number().int().min(6).max(20),
+  source_type: SourceTypeSchema,
+  source_refs: z.array(z.string().trim().min(1).max(80)).min(1).max(12),
+}).strict();
+
+export const StorySchema = z.object({
+  intro: z.string().trim().min(1).max(600),
+  beats: z.array(StoryBeatSchema).min(3).max(5),
+}).strict().superRefine((story, ctx) => {
+  const ids = new Set<string>();
+  story.beats.forEach((beat, index) => {
+    if (ids.has(beat.id)) ctx.addIssue({ code: 'custom', path: ['beats', index, 'id'], message: 'Beat IDs must be unique.' });
+    ids.add(beat.id);
+    const endpoint = index === 0 || index === story.beats.length - 1;
+    if (endpoint !== (beat.element_id === null)) {
+      ctx.addIssue({ code: 'custom', path: ['beats', index, 'element_id'], message: 'Scene and invitation have no element; detail beats require an element.' });
+    }
+    if (new Set(beat.source_refs).size !== beat.source_refs.length) {
+      ctx.addIssue({ code: 'custom', path: ['beats', index, 'source_refs'], message: 'Evidence references must be unique.' });
+    }
+    if (beat.element_id && !beat.source_refs.includes(beat.element_id)) {
+      ctx.addIssue({ code: 'custom', path: ['beats', index, 'source_refs'], message: 'Detail evidence must include its element.' });
+    }
+  });
+});
+
+export type StoryBeat = z.infer<typeof StoryBeatSchema>;
+export type Story = z.infer<typeof StorySchema>;
+
 export const CreativeDnaSchema = z.object({
   artwork: ArtworkRefSchema,
   elements: z.array(ElementSchema),
@@ -118,6 +153,17 @@ export const CreativeDnaSchema = z.object({
   tradition: TraditionSchema,
   relationships: z.array(RelationshipSchema),
   generation: GenerationSchema.optional(),
+  story: StorySchema.optional(),
+}).superRefine((document, ctx) => {
+  const elementIds = new Set(document.elements.map(element => element.id));
+  document.story?.beats.forEach((beat, index) => {
+    if (beat.element_id && !elementIds.has(beat.element_id)) {
+      ctx.addIssue({ code: 'custom', path: ['story', 'beats', index, 'element_id'], message: 'Unknown story element.' });
+    }
+    if (beat.source_refs.some(ref => ref !== 'museum_record' && !elementIds.has(ref))) {
+      ctx.addIssue({ code: 'custom', path: ['story', 'beats', index, 'source_refs'], message: 'Unknown story evidence.' });
+    }
+  });
 });
 
 export type SourceType = z.infer<typeof SourceTypeSchema>;

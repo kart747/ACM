@@ -52,7 +52,7 @@ The teammate critique identified six major weaknesses. V2 directly addresses the
 | Clickable dots feel generic | Real visual segmentation/masks |
 | “Step Inside” was mostly a tooltip | The selected element becomes visually isolated |
 | Relationships were mostly preselected | Gemini discovers candidate relationships |
-| Tiny 5-artwork universe | Prepare a larger 20–30 artwork corpus |
+| Tiny 5-artwork universe | Prepare a larger 20–30 artwork corpus | keep 
 | Fake-looking confidence scores | Repeated agreement / evidence instead of self-reported confidence |
 | No real creator connection | Include at least one real local creator with permission |
 

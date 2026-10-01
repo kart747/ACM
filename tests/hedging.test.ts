@@ -427,7 +427,7 @@ describe('the linter is not a client-side dependency', () => {
 
   it('is unreachable from the app entry points', () => {
     const seen = new Set<string>();
-    const queue = [path.join(SRC, 'app/page.tsx'), path.join(SRC, 'app/layout.tsx')];
+    const queue = ['app/page.tsx', 'app/v2/page.tsx', 'app/classic/page.tsx', 'app/layout.tsx'].map(file => path.join(SRC, file));
     while (queue.length) {
       const file = queue.pop()!;
       if (seen.has(file)) continue;

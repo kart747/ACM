@@ -38,7 +38,7 @@ export function HeroSection({ onExplore }: HeroSectionProps) {
 
         {/* Subtitle */}
         <p className="text-lg sm:text-xl md:text-2xl text-stone-300 max-w-2xl font-light leading-relaxed mb-10">
-          Follow the living creative DNA of visual archetypes as they resonate across continents and centuries through Silk Road trade routes, parallel traditions, and shared human imagination.
+          Explore artworks and compare selected motifs across the collection. Visual similarities invite closer looking; they do not establish historical influence or transmission.
         </p>
 
         {/* Call to action buttons */}
@@ -62,19 +62,19 @@ export function HeroSection({ onExplore }: HeroSectionProps) {
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-amber-400 font-serif text-lg mb-1">01. Step Inside</div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Isolate real human-painted motifs with precision spotlights and visual segmentation on authentic museum scans.
+              Explore selected details in artwork reproductions with motif spotlights.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-amber-400 font-serif text-lg mb-1">02. Cross Boundaries</div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Witness how motifs resonate across Mughal courts, Safavid Persia, Rajput traditions, Edo woodblock prints, and Dutch masters.
+              Compare motifs and compositions across the traditions represented in the current collection.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-amber-400 font-serif text-lg mb-1">03. Grounded Evidence</div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Multi-run Gemini consensus protects against AI hallucinations, separating verified history from speculation.
+              Consult linked source records and clearly labeled interpretations. Optional Gemini checks offer a single text-only assessment, not historical verification.
             </p>
           </div>
         </div>

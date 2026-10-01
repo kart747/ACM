@@ -1,16 +1,14 @@
-import { GoogleGenAI } from '@google/genai';
+import type { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
+import { REQUIRED_GEMINI_MODEL } from '@/lib/gemini/routing-client';
 
-/**
- * Node-only Gemini access for the build-time pipeline. Nothing in the app
- * imports this module; the key is read from the environment of the process
- * running `npm run generate:artscape` and never reaches the browser.
- */
+/** Node-only legacy pipeline helpers. Model calls require an injected offline client. */
 if (typeof window !== 'undefined') {
   throw new Error('src/lib/gemini/client.ts must not be bundled into the browser.');
 }
 
-export const DEFAULT_MODEL = 'gemini-2.5-flash';
+export const DEFAULT_MODEL = REQUIRED_GEMINI_MODEL;
+export const LEGACY_GENERATION_DISABLED_MESSAGE = 'Legacy generation is disabled for this provider; use the artwork story endpoint';
 
 export type ContentPart = { text: string } | { inlineData: { mimeType: string; data: string } };
 
@@ -55,7 +53,7 @@ export function readGeminiConfig(env: Record<string, string | undefined> = proce
   }
   if (!keys.length) {
     throw new GeminiUnavailableError(
-      'No Gemini key is set. Copy .env.example to .env and set GEMINI_API_KEY (or GEMINI_API_KEY_1, _2, …) from https://aistudio.google.com/apikey.',
+      LEGACY_GENERATION_DISABLED_MESSAGE,
     );
   }
   return { apiKey: keys[0].apiKey, keys, model: env.GEMINI_MODEL?.trim() || DEFAULT_MODEL };
@@ -119,13 +117,11 @@ export function createGeminiCall(
     sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
   }: GeminiCallOptions = {},
 ): ModelCall {
+  // Only Routing.run is authorized; this legacy adapter has no live transport.
+  if (!clientFor) throw new GeminiUnavailableError(LEGACY_GENERATION_DISABLED_MESSAGE);
   const slots = typeof keys === 'string' ? [{ label: 'key-default', apiKey: keys }] : keys;
   if (!slots.length) throw new GeminiUnavailableError('createGeminiCall needs at least one API key.');
-  const clients = slots.map(({ apiKey }) => {
-    if (clientFor) return clientFor(apiKey);
-    const ai = new GoogleGenAI({ apiKey });
-    return (params: Parameters<GenerateContent>[0]) => ai.models.generateContent(params);
-  });
+  const clients = slots.map(({ apiKey }) => clientFor(apiKey));
   const redact = (text: string) => slots.reduce((t, s) => t.split(s.apiKey).join(`<${s.label}>`), text);
   let active = 0;
   const exhausted = new Set<number>();
@@ -189,14 +185,8 @@ function nextSlot(from: number, skip: Set<number>, count: number): number | unde
   return undefined;
 }
 
-export async function listModels(apiKey: string): Promise<string[]> {
-  const ai = new GoogleGenAI({ apiKey });
-  const names: string[] = [];
-  const pager = await ai.models.list();
-  for await (const m of pager) {
-    if (m.supportedActions?.includes('generateContent') && m.name) names.push(m.name.replace(/^models\//, ''));
-  }
-  return names.sort();
+export async function listModels(_apiKey: string): Promise<string[]> {
+  throw new GeminiUnavailableError(LEGACY_GENERATION_DISABLED_MESSAGE);
 }
 
 /**

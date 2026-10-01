@@ -1,13 +1,13 @@
 # ARTSCAPE — backend
 
-There is no server. The only backend work is the **build-time Gemini pipeline**, which lives in
-`src/lib/gemini/` and runs from `npm run generate:artscape`. See the "Gemini pipeline" section of
-the root README.
+The backend runs inside Next.js API routes in `src/app/api/`; there is no separate backend service to start.
 
-The web app never calls Gemini and never sees the API key. It reads validated CreativeDNA from
-`src/data/generated/` and falls back to the curated data in `src/data/artworks.ts`.
+The current experience reads a bundled ten-artwork collection. Story GET requests return a validated cache entry or a prepared guide without calling Gemini. Explicit generation runs server-side through Routing.run using only `gemini-3.8-flash`; failure returns the prepared guide. API credentials stay on the server. See [STORYTELLING.md](../STORYTELLING.md).
 
-Motif segmentation (SAM 2.1) also needs no server: it runs in the visitor's browser, in a Web
-Worker. See "Motif segmentation" in the root README.
+The `/classic` experience reads validated CreativeDNA from `src/data/generated/` and falls back to the curated data in `src/data/artworks.ts`. The legacy Google-SDK pipeline is retained for reference and offline tests, but live generation is disabled.
 
-Later phases (not built): embeddings for visual similarity.
+Classic motif segmentation (SAM 2.1) runs in the visitor's browser in a Web Worker. See "Classic controls and segmentation" in the [root README](../README.md).
+
+Embeddings-based visual similarity is not implemented.
+adhesh
+11

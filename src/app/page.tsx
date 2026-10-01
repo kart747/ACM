@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navbar } from '@/components/v2/Navbar';
 import { HeroSection } from '@/components/v2/HeroSection';
 import { GalleryView } from '@/components/v2/GalleryView';
@@ -9,212 +9,127 @@ import { MotifDrawer } from '@/components/v2/MotifDrawer';
 import { MotifTravelModal } from '@/components/v2/MotifTravelModal';
 import { JourneyTrail } from '@/components/v2/JourneyTrail';
 import { GeminiInspectorModal } from '@/components/v2/GeminiInspectorModal';
+import { GuidedStoryPanel } from '@/components/v2/GuidedStoryPanel';
+import { useGuidedStory } from '@/components/v2/useGuidedStory';
 import { V2_ARTWORKS, V2_ELEMENTS, V2_RELATIONSHIPS } from '@/data/artworks-v2';
-import { validateCreativeDna } from '@/lib/creative-dna/validate';
 import type { ArtworkData, ElementData, RelationshipData, JourneyHop } from '@/components/v2/types';
 
 export default function Page() {
   const [currentScreen, setCurrentScreen] = useState<'hero' | 'gallery' | 'stage'>('hero');
-  const [artworks, setArtworks] = useState<ArtworkData[]>(V2_ARTWORKS as ArtworkData[]);
-  const [selectedArtwork, setSelectedArtwork] = useState<ArtworkData>(V2_ARTWORKS[0] as ArtworkData);
-  const [elements, setElements] = useState<ElementData[]>([]);
-  const [selectedElement, setSelectedElement] = useState<ElementData | null>(null);
-  const [relationships, setRelationships] = useState<RelationshipData[]>([]);
+  const [selection, setSelection] = useState<{ artworkId: string; elementId: string | null }>({
+    artworkId: V2_ARTWORKS[0].id,
+    elementId: null,
+  });
   const [activeTravelRel, setActiveTravelRel] = useState<RelationshipData | null>(null);
-  const [journeyHops, setJourneyHops] = useState<JourneyHop[]>([
-    { artwork: V2_ARTWORKS[0] as ArtworkData, timestamp: new Date().toLocaleTimeString() }
-  ]);
+  const [journeyHops, setJourneyHops] = useState<JourneyHop[]>([]);
   const [inspectorOpen, setInspectorOpen] = useState(false);
 
-  // Fetch all artworks from API on mount
-  useEffect(() => {
-    async function loadArtworks() {
-      try {
-        const res = await fetch('/api/artworks');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setArtworks(data);
-            setSelectedArtwork(data[0]);
-          }
-        }
-      } catch (err) {
-        console.warn('Using local V2 artworks corpus fallback');
-      }
-    }
-    loadArtworks();
-  }, []);
-
-  // Fetch elements whenever selected artwork changes
-  useEffect(() => {
-    async function loadElements() {
-      try {
-        const res = await fetch(`/api/artworks/${selectedArtwork.id}/elements`);
-        if (res.ok) {
-          const data = await res.json();
-          setElements(data);
-          return;
-        }
-      } catch (e) {
-        // Fallback
-      }
-      setElements((V2_ELEMENTS[selectedArtwork.id] as ElementData[]) || []);
-    }
-    loadElements();
-    setSelectedElement(null);
-  }, [selectedArtwork]);
-
-  // Handle selecting an element to discover motif relationships
-  const handleSelectElement = async (elem: ElementData) => {
-    setSelectedElement(elem);
-    try {
-      const res = await fetch('/api/relationships/discover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ artworkId: selectedArtwork.id, elementId: elem.id }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setRelationships(data);
-        return;
-      }
-    } catch (e) {
-      // Fallback
-    }
-    const local = (V2_RELATIONSHIPS as RelationshipData[]).filter(
-      (r) => r.sourceArtworkId === selectedArtwork.id && r.sourceElementId === elem.id
-    );
-    setRelationships(local);
-  };
-
-  // User chooses an artwork from gallery
-  const handleSelectArtworkFromGallery = (art: ArtworkData) => {
-    setSelectedArtwork(art);
-    setCurrentScreen('stage');
-    setJourneyHops((prev) => [
-      ...prev,
-      { artwork: art, timestamp: new Date().toLocaleTimeString() },
-    ]);
-  };
-
-  // User initiates travel transition
-  const handleTravel = (rel: RelationshipData) => {
-    setActiveTravelRel(rel);
-  };
-
-  // Complete travel and land on target artwork
-  const handleArriveAtTarget = () => {
-    if (!activeTravelRel) return;
-    const target = artworks.find((a) => a.id === activeTravelRel.targetArtworkId);
-    if (target) {
-      setSelectedArtwork(target);
-      setActiveTravelRel(null);
-      setSelectedElement(null);
-      setCurrentScreen('stage');
-      setJourneyHops((prev) => [
-        ...prev,
-        { artwork: target, timestamp: new Date().toLocaleTimeString() },
-      ]);
-    }
-  };
-
-  // Target element helper for travel modal
+  // The API serves this same bundled corpus; derive details together to avoid stale cross-artwork responses.
+  const artworks = V2_ARTWORKS;
+  const selectedArtwork = artworks.find(art => art.id === selection.artworkId) ?? artworks[0];
+  const elements = V2_ELEMENTS[selectedArtwork.id] ?? [];
+  const selectedElement = elements.find(element => element.id === selection.elementId) ?? null;
+  const tour = useGuidedStory(selectedArtwork, elements, currentScreen === 'stage');
+  const relationships = selectedElement
+    ? V2_RELATIONSHIPS.filter(rel => rel.sourceArtworkId === selectedArtwork.id && rel.sourceElementId === selectedElement.id)
+    : [];
   const targetElement = activeTravelRel
-    ? (V2_ELEMENTS[activeTravelRel.targetArtworkId] as ElementData[])?.find(
-        (e) => e.id === activeTravelRel.targetElementId
-      ) || null
+    ? V2_ELEMENTS[activeTravelRel.targetArtworkId]?.find(element => element.id === activeTravelRel.targetElementId) ?? null
     : null;
+
+  useEffect(() => {
+    if (currentScreen === 'stage' && (selection.elementId || tour.active) && window.matchMedia?.('(max-width: 1023px)').matches) {
+      document.querySelector('[data-artwork-canvas]')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [currentScreen, selectedArtwork.id, selection.elementId, tour.active]);
+
+  const clearElement = () => setSelection(previous => ({ ...previous, elementId: null }));
+  const startStory = () => { clearElement(); setActiveTravelRel(null); void tour.start(); };
+  const selectElement = (element: ElementData) => {
+    tour.stop();
+    setSelection({ artworkId: selectedArtwork.id, elementId: element.id });
+  };
+  const openInspector = () => { tour.pause(); setInspectorOpen(true); };
+  const navigate = (screen: 'hero' | 'gallery' | 'stage') => {
+    tour.stop();
+    clearElement();
+    setActiveTravelRel(null);
+    setCurrentScreen(screen);
+  };
+  const visitArtwork = (artwork: ArtworkData, element?: ElementData, record = true) => {
+    tour.stop();
+    setSelection({ artworkId: artwork.id, elementId: element?.id ?? null });
+    setActiveTravelRel(null);
+    setCurrentScreen('stage');
+    if (record) {
+      setJourneyHops(previous => [...previous, { artwork, element, timestamp: new Date().toLocaleTimeString() }]);
+    }
+  };
+  const handleTravel = (relationship: RelationshipData) => {
+    if (relationships.some(rel => rel.id === relationship.id)) setActiveTravelRel(relationship);
+  };
+  const arrive = () => {
+    const artwork = artworks.find(art => art.id === activeTravelRel?.targetArtworkId);
+    if (artwork && targetElement) visitArtwork(artwork, targetElement);
+  };
 
   return (
     <div className="min-h-screen bg-stone-950 text-white font-sans selection:bg-amber-500/30 selection:text-white">
-      {/* Top Navigation */}
-      <Navbar
-        currentScreen={currentScreen}
-        onNavigate={(screen) => setCurrentScreen(screen)}
-        onOpenInspector={() => setInspectorOpen(true)}
-      />
-
-      {/* Main Screen Views */}
-      <main className="relative">
+      <Navbar currentScreen={currentScreen} onNavigate={navigate} onOpenInspector={openInspector} />
+      <main>
         {currentScreen === 'hero' && (
           <>
-            <HeroSection onExplore={() => setCurrentScreen('gallery')} />
-            <GalleryView
-              artworks={artworks}
-              onSelectArtwork={handleSelectArtworkFromGallery}
-            />
+            <HeroSection onExplore={() => navigate('gallery')} />
+            <GalleryView artworks={artworks} onSelectArtwork={artwork => visitArtwork(artwork)} />
           </>
         )}
-
         {currentScreen === 'gallery' && (
-          <div className="pt-20">
-            <GalleryView
-              artworks={artworks}
-              onSelectArtwork={handleSelectArtworkFromGallery}
-            />
+          <div className="pt-20 pb-24">
+            <GalleryView artworks={artworks} onSelectArtwork={artwork => visitArtwork(artwork)} />
           </div>
         )}
-
         {currentScreen === 'stage' && (
           <ImmersiveStage
+            key={selectedArtwork.id}
             artwork={selectedArtwork}
             elements={elements}
             selectedElement={selectedElement}
-            onSelectElement={handleSelectElement}
-            onBackToGallery={() => setCurrentScreen('gallery')}
-            onAnalyzeGemini={() => setInspectorOpen(true)}
+            onSelectElement={selectElement}
+            onClearElement={() => { tour.stop(); clearElement(); }}
+            onBackToGallery={() => navigate('gallery')}
+            onAnalyzeGemini={openInspector}
+            onStartStory={startStory}
+            storyActive={tour.active}
+            focusedElement={tour.focusedElement}
           />
         )}
       </main>
-
-      {/* Slide-out Motif Drawer */}
+      <GuidedStoryPanel artwork={selectedArtwork} controller={tour} onExploreDetail={() => { if (tour.focusedElement) selectElement(tour.focusedElement); }} />
       <MotifDrawer
-        element={selectedElement}
+        element={currentScreen === 'stage' && !activeTravelRel && !tour.active ? selectedElement : null}
         relationships={relationships}
         allArtworks={artworks}
-        onClose={() => setSelectedElement(null)}
+        onClose={clearElement}
         onTravel={handleTravel}
       />
-
-      {/* Climax Travel Modal ("The Motif Travels") */}
       <MotifTravelModal
+        key={activeTravelRel?.id ?? 'no-travel'}
         relationship={activeTravelRel}
-        sourceArtwork={
-          activeTravelRel
-            ? artworks.find((a) => a.id === activeTravelRel.sourceArtworkId) || null
-            : null
-        }
-        targetArtwork={
-          activeTravelRel
-            ? artworks.find((a) => a.id === activeTravelRel.targetArtworkId) || null
-            : null
-        }
+        sourceArtwork={artworks.find(art => art.id === activeTravelRel?.sourceArtworkId) ?? null}
+        targetArtwork={artworks.find(art => art.id === activeTravelRel?.targetArtworkId) ?? null}
         sourceElement={selectedElement}
         targetElement={targetElement}
         onClose={() => setActiveTravelRel(null)}
-        onArriveAtTarget={handleArriveAtTarget}
+        onArriveAtTarget={arrive}
       />
-
-      {/* Persistent Journey Trail ("Your Path") */}
       <JourneyTrail
         hops={journeyHops}
-        onSelectHop={(hop) => {
-          setSelectedArtwork(hop.artwork);
-          setCurrentScreen('stage');
-        }}
-        onClearTrail={() =>
-          setJourneyHops([
-            { artwork: selectedArtwork, timestamp: new Date().toLocaleTimeString() },
-          ])
-        }
+        onSelectHop={hop => visitArtwork(hop.artwork, hop.element, false)}
+        onClearTrail={() => setJourneyHops([{ artwork: selectedArtwork, element: selectedElement ?? undefined, timestamp: new Date().toLocaleTimeString() }])}
       />
-
-      {/* Gemini Live Multimodal Inspector Modal */}
-      <GeminiInspectorModal
-        artworks={artworks}
-        isOpen={inspectorOpen}
-        onClose={() => setInspectorOpen(false)}
-      />
+      <GeminiInspectorModal artworks={artworks} isOpen={inspectorOpen} onClose={() => setInspectorOpen(false)} />
     </div>
   );
 }

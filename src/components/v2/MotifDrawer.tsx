@@ -7,6 +7,7 @@ import type { ElementData, RelationshipData, ArtworkData } from './types';
 interface MotifDrawerProps {
   element: ElementData | null;
   relationships: RelationshipData[];
+  loading?: boolean;
   allArtworks: ArtworkData[];
   onClose: () => void;
   onTravel: (relationship: RelationshipData) => void;
@@ -15,6 +16,7 @@ interface MotifDrawerProps {
 export function MotifDrawer({
   element,
   relationships,
+  loading = false,
   allArtworks,
   onClose,
   onTravel,
@@ -28,10 +30,10 @@ export function MotifDrawer({
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: '100%', opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed top-0 right-0 bottom-0 w-full sm:w-[460px] z-50 bg-stone-950/95 backdrop-blur-2xl border-l border-white/10 flex flex-col shadow-2xl shadow-black overflow-hidden"
+        className="fixed right-0 bottom-0 h-[48dvh] lg:top-0 lg:h-auto w-full lg:w-[460px] z-50 bg-stone-950/95 backdrop-blur-2xl border-t lg:border-l border-white/10 rounded-t-2xl lg:rounded-none flex flex-col shadow-2xl shadow-black overflow-hidden"
       >
         {/* Drawer Header */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+        <div className="shrink-0 p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] uppercase tracking-widest font-sans font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -48,6 +50,7 @@ export function MotifDrawer({
 
           <button
             onClick={onClose}
+            aria-label="Close artwork detail"
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-stone-400 hover:text-white transition-colors"
           >
             ✕
@@ -59,8 +62,12 @@ export function MotifDrawer({
           {/* Provenance Badge */}
           <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-between">
             <span className="text-xs text-stone-400 font-sans">Provenance</span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              {element.meaning.sourceType === 'externally_verified' ? '✓ Museum Verified' : '★ Artist Declared'}
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium bg-white/5 text-stone-200 border border-white/10">
+              {element.meaning.sourceType === 'externally_verified'
+                ? 'Externally Sourced'
+                : element.meaning.sourceType === 'artist_declared'
+                  ? 'Artist Declared'
+                  : 'AI Inferred · Unverified'}
             </span>
           </div>
 
@@ -77,7 +84,7 @@ export function MotifDrawer({
           {/* Technique & Materials */}
           <div>
             <h4 className="text-xs uppercase tracking-wider text-amber-400/90 font-sans font-semibold mb-2">
-              Technique & Pigments
+              Technique & Materials
             </h4>
             <p className="text-xs text-stone-300 font-sans leading-relaxed bg-black/30 p-4 rounded-xl border border-white/5">
               {element.technique}
@@ -87,7 +94,7 @@ export function MotifDrawer({
           {/* Artistic Tradition Lineage */}
           <div>
             <h4 className="text-xs uppercase tracking-wider text-amber-400/90 font-sans font-semibold mb-2">
-              Lineage & Tradition
+              Tradition & Context
             </h4>
             <p className="text-xs text-stone-400 font-sans leading-relaxed">
               {element.tradition}
@@ -98,16 +105,20 @@ export function MotifDrawer({
           <div className="pt-4 border-t border-white/10">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs uppercase tracking-wider text-amber-400 font-sans font-semibold">
-                Where This Motif Travels
+                Visual Comparisons
               </h4>
               <span className="text-[11px] font-sans px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-medium">
-                {relationships.length} connection{relationships.length === 1 ? '' : 's'}
+                {loading ? 'Loading…' : `${relationships.length} comparison${relationships.length === 1 ? '' : 's'}`}
               </span>
             </div>
 
-            {relationships.length === 0 ? (
-              <p className="text-xs text-stone-500 font-sans italic">
-                No outbound motif connections defined for this element.
+            {loading ? (
+              <p role="status" className="text-sm text-stone-300 font-sans">
+                Loading visual comparisons…
+              </p>
+            ) : relationships.length === 0 ? (
+              <p className="text-xs text-stone-400 font-sans italic">
+                No visual comparisons defined for this element.
               </p>
             ) : (
               <div className="space-y-3">
@@ -142,8 +153,8 @@ export function MotifDrawer({
                       </p>
 
                       <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                        <span className="text-[10px] font-sans text-emerald-400 font-medium">
-                          ✓ Consensus: {rel.agreement} Agreement
+                        <span className="text-[11px] font-sans text-stone-300">
+                          Visual comparison · not historical verification
                         </span>
                         <button
                           onClick={() => onTravel(rel)}

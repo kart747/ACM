@@ -1,4 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { V2_ARTWORKS, V2_ELEMENTS, V2_RELATIONSHIPS } from '@/data/artworks-v2';
+
+beforeEach(() => {
+  for (const key of Object.keys(process.env).filter(key => key.startsWith('GEMINI_API_KEY'))) vi.stubEnv(key, '');
+  vi.stubEnv('GEMINI_API_KEY', '');
+});
+afterEach(() => vi.unstubAllEnvs());
 import { GET as getArtworks } from '@/app/api/artworks/route';
 import { GET as getArtworkById } from '@/app/api/artworks/[id]/route';
 import { GET as getElements } from '@/app/api/artworks/[id]/elements/route';
@@ -30,14 +37,14 @@ describe('Next.js API Route Handlers', () => {
     expect(data.gemini).toBeDefined();
   });
 
-  it('GET /api/artworks returns all 5 V2 artworks', async () => {
+  it('GET /api/artworks returns all 10 V2 artworks', async () => {
     const res = await getArtworks();
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBe(5);
+    expect(data.length).toBe(10);
     expect(data[0].id).toBe('art_001');
-    expect(data[0].title).toBe('Peacock in the Royal Garden');
+    expect(data).toEqual(V2_ARTWORKS);
   });
 
   it('GET /api/artworks/[id] returns a single artwork', async () => {
@@ -46,7 +53,7 @@ describe('Next.js API Route Handlers', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.id).toBe('art_001');
-    expect(data.creator).toBe('Unknown Mughal Artist');
+    expect(data).toEqual(V2_ARTWORKS[0]);
   });
 
   it('GET /api/artworks/[id]/elements returns motifs and features', async () => {
@@ -56,7 +63,7 @@ describe('Next.js API Route Handlers', () => {
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThanOrEqual(2);
-    expect(data[0].label).toBe('Peacock');
+    expect(data).toEqual(V2_ELEMENTS.art_001);
     expect(data[0].geometry.type).toBe('polygon');
   });
 
@@ -81,11 +88,10 @@ describe('Next.js API Route Handlers', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBe(3); // rel_001, rel_002, rel_003
-    expect(data[0].targetArtworkId).toBe('art_002');
+    expect(data).toEqual(V2_RELATIONSHIPS.filter(rel => rel.sourceArtworkId === 'art_001' && rel.sourceElementId === 'elem_001_01'));
   });
 
-  it('POST /api/relationships/verify validates consensus', async () => {
+  it('POST /api/relationships/verify reports no AI verification without credentials', async () => {
     const req = makeRequest('http://localhost:3000/api/relationships/verify', 'POST', {
       relationshipId: 'rel_001',
     });
@@ -93,8 +99,9 @@ describe('Next.js API Route Handlers', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.relationship.id).toBe('rel_001');
-    expect(data.verificationRuns).toBe(5);
-    expect(data.status).toBe('verified');
+    expect(data.verificationRuns).toBe(0);
+    expect(data.agreement).toBe('');
+    expect(data.status).toBe('candidate');
   });
 
   it('POST /api/analyze provides structured CreativeDNA analysis', async () => {

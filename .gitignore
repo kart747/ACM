@@ -12,8 +12,9 @@ next-env.d.ts
 # Test output
 coverage/
 
-# Gemini response cache (build-time CLI)
+# Gemini response caches
 .artscape-cache/
+.cache/artscape-stories/
 
 # Stray secret copy / build backup
 .enc

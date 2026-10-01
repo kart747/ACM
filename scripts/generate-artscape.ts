@@ -4,9 +4,9 @@
  *     [--estimate] [--max-requests=10] [--keys=key-default,key-1] [--overwrite]
  *     [--dry-run] [--list-models]
  *
- * Regenerates ARTSCAPE's CreativeDNA with Gemini and stores only validated
- * documents in src/data/generated/. The app keeps working without this: any
- * artwork without a valid document uses the curated data in src/data/artworks.ts.
+ * Legacy generation is disabled; use the artwork story endpoint for live AI.
+ * Only --estimate is available. The retained pipeline uses curated fallbacks
+ * for artworks without valid documents in src/data/generated/.
  *
  * Quota safety (free-tier keys allow few requests per day):
  *   --estimate       print the request count for the selection and exit; no API call, no key needed
@@ -17,7 +17,7 @@
  *   --overwrite      regenerate artworks that already have a stored document (skipped otherwise)
  *   cache            successful responses are kept in .artscape-cache/ (gitignored), so rerunning the
  *                    same command continues where a quota-limited run stopped; hits cost no request
- * --dry-run still calls Gemini; it only skips writing files.
+ * --dry-run and --list-models are disabled without reading keys or sending requests.
  */
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -26,7 +26,7 @@ import { CreativeDnaSchema, type CreativeDna } from '@/lib/creative-dna/schema';
 import {
   createGeminiCall,
   GeminiUnavailableError,
-  listModels,
+  LEGACY_GENERATION_DISABLED_MESSAGE,
   readGeminiConfig,
 } from '@/lib/gemini/client';
 import { formatAgreement } from '@/lib/gemini/agreement';
@@ -37,16 +37,6 @@ import { AGREEMENT_RUNS } from '@/lib/creative-dna/schema';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT_DIR = path.join(ROOT, 'src/data/generated');
 const CACHE_DIR = path.join(ROOT, '.artscape-cache');
-
-function loadEnv() {
-  for (const file of ['.env.local', '.env']) {
-    try {
-      process.loadEnvFile(path.join(ROOT, file));
-    } catch {
-      // Missing env files are fine; readGeminiConfig reports a missing key.
-    }
-  }
-}
 
 function arg(name: string): string | undefined {
   const hit = process.argv.find((a) => a === `--${name}` || a.startsWith(`--${name}=`));
@@ -98,11 +88,8 @@ function list(name: string): string[] | undefined {
 }
 
 async function main() {
-  loadEnv();
-  if (arg('list-models')) {
-    // A model listing, not a generateContent request.
-    console.log((await listModels(loadConfig().apiKey)).join('\n'));
-    return;
+  if (arg('list-models') || !arg('estimate')) {
+    throw new GeminiUnavailableError(LEGACY_GENERATION_DISABLED_MESSAGE);
   }
 
   // ---- selection and request estimate: no key or network needed ----

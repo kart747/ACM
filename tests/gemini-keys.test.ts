@@ -43,7 +43,7 @@ describe('readGeminiConfig', () => {
     const config = readGeminiConfig({ GEMINI_API_KEY: 'solo' });
     expect(config.apiKey).toBe('solo');
     expect(config.keys).toEqual([{ label: 'key-default', apiKey: 'solo' }]);
-    expect(config.model).toBe('gemini-2.5-flash');
+    expect(config.model).toBe('gemini-3.8-flash');
   });
 
   it('orders numbered keys numerically, then the plain key, skipping blanks, placeholders and duplicates', () => {

@@ -12,9 +12,11 @@ interface GalleryViewProps {
 export function GalleryView({ artworks, onSelectArtwork }: GalleryViewProps) {
   const [filter, setFilter] = useState<string>('all');
 
-  const filtered = filter === 'all' 
-    ? artworks 
-    : artworks.filter((a) => a.tradition.toLowerCase().includes(filter.toLowerCase()));
+  const traditions = [...new Set(artworks.map((artwork) => artwork.tradition))];
+  const activeFilter = traditions.includes(filter) ? filter : 'all';
+  const filtered = activeFilter === 'all'
+    ? artworks
+    : artworks.filter((artwork) => artwork.tradition === activeFilter);
 
   return (
     <section id="gallery" className="max-w-7xl mx-auto px-6 py-16">
@@ -28,18 +30,18 @@ export function GalleryView({ artworks, onSelectArtwork }: GalleryViewProps) {
             Curated Masterpieces
           </h2>
           <p className="text-sm text-stone-400 mt-1 max-w-lg">
-            Human-created works connected by living motifs across space, time, and technique.
+            {artworks.length} human-made artworks with sourced records, visual comparisons, and prepared stories that work without Gemini.
           </p>
         </div>
 
         {/* Filter Pills */}
         <div className="flex flex-wrap gap-2">
-          {['all', 'Mughal', 'Persian', 'Ukiyo-e', 'Phad', 'Contemporary'].map((tag) => (
+          {['all', ...traditions].map((tag) => (
             <button
               key={tag}
               onClick={() => setFilter(tag)}
               className={`px-3 py-1.5 rounded-lg text-xs font-sans tracking-wide transition-all ${
-                filter === tag 
+                activeFilter === tag
                   ? 'bg-amber-400 text-black font-semibold shadow-md shadow-amber-400/20' 
                   : 'bg-white/5 hover:bg-white/10 text-stone-300 border border-white/5'
               }`}
@@ -76,11 +78,15 @@ export function GalleryView({ artworks, onSelectArtwork }: GalleryViewProps) {
               <div className="absolute top-3 left-3">
                 {artwork.sourceType === 'externally_verified' ? (
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-sans font-medium tracking-wide uppercase bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 backdrop-blur-md">
-                    ✓ Verified Museum Record
+                    Externally sourced description
+                  </span>
+                ) : artwork.sourceType === 'artist_declared' ? (
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-sans font-medium tracking-wide uppercase bg-amber-500/20 border border-amber-500/40 text-amber-300 backdrop-blur-md">
+                    Artist-declared description
                   </span>
                 ) : (
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-sans font-medium tracking-wide uppercase bg-amber-500/20 border border-amber-500/40 text-amber-300 backdrop-blur-md">
-                    ★ Artist Declared
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-sans font-medium tracking-wide uppercase bg-violet-500/20 border border-violet-500/40 text-violet-200 backdrop-blur-md">
+                    Description: AI interpretation
                   </span>
                 )}
               </div>
@@ -123,9 +129,21 @@ export function GalleryView({ artworks, onSelectArtwork }: GalleryViewProps) {
 
               {/* Action Footer */}
               <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-                <span className="text-[11px] text-stone-400 truncate max-w-[200px]" title={artwork.source}>
-                  {artwork.source}
-                </span>
+                {'sourceUrl' in artwork && typeof artwork.sourceUrl === 'string' && /^https?:\/\//i.test(artwork.sourceUrl) ? (
+                  <a
+                    href={artwork.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-amber-300 underline hover:text-amber-200 max-w-[200px]"
+                    title={artwork.source}
+                  >
+                    Museum record ↗
+                  </a>
+                ) : (
+                  <span className="text-[11px] text-stone-400 max-w-[200px]" title={artwork.source}>
+                    {artwork.source}
+                  </span>
+                )}
                 <button
                   onClick={() => onSelectArtwork(artwork)}
                   className="text-xs font-sans font-semibold text-amber-300 hover:text-amber-200 transition-colors flex items-center gap-1"
