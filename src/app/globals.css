@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+
+:root {
+  --surface: #0b0b0c;
+  --surface-raised: #141416;
+  --surface-sunken: #050506;
+  --hairline: #26262a;
+  --ink: #ece9e2;
+  --ink-dim: #9a968d;
+  --ink-faint: #6a675f;
+  --accent: #c9a227;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--surface);
+  color: var(--ink);
+  font-family:
+    ui-serif, Georgia, 'Times New Roman', 'Iowan Old Style', 'Palatino Linotype',
+    serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow: hidden;
+}
+
+.ui-sans {
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+/* Single shared focus treatment so the hotspot ring and buttons agree. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* In the base layer so Tailwind utilities (borders, backgrounds) can override it. */
+@layer base {
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.3);
+}
+
+/* Thin, museum-wall scrollbars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Idle hotspots breathe so they read on a projector without hover. */
+@keyframes hotspot-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+.hotspot-pulse {
+  animation: hotspot-pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-pulse {
+    display: none;
+  }
+}
+
+/* Until the viewer steps inside, the opening screen owns the painting; the
+   stage's copy appears only once the handoff has landed on it. */
+[data-pre-entry] [data-artwork-frame] {
+  visibility: hidden;
+}
