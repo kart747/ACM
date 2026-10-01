@@ -80,9 +80,9 @@ export function MotifTravelModal({
 
           {/* Side by Side Visual Comparison */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-            {/* Trajectory flight arrow */}
-            <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-amber-400 text-black font-bold items-center justify-center shadow-lg shadow-amber-500/50">
-              ✈
+            {/* Bidirectional resonance badge */}
+            <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-amber-400 text-black font-bold text-xl items-center justify-center shadow-lg shadow-amber-500/50" title="Bidirectional Cultural Dialogue & Resonance">
+              ⇄
             </div>
 
             {/* Source Card */}
@@ -93,8 +93,8 @@ export function MotifTravelModal({
                   alt={sourceArtwork.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/80 text-[10px] text-amber-300 font-sans">
-                  Origin: {sourceArtwork.year}
+                <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-black/80 text-[10px] text-amber-300 font-sans border border-amber-500/30">
+                  Tradition A • {sourceArtwork.year}
                 </div>
               </div>
               <div>
@@ -123,8 +123,8 @@ export function MotifTravelModal({
                   alt={targetArtwork.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-400 text-black font-bold text-[10px] font-sans">
-                  Destination: {targetArtwork.year}
+                <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-amber-400 text-black font-bold text-[10px] font-sans">
+                  Tradition B • {targetArtwork.year}
                 </div>
               </div>
               <div>
@@ -146,17 +146,30 @@ export function MotifTravelModal({
             </div>
           </div>
 
-          {/* Narrative & Cultural Journey */}
-          <div className="bg-white/[0.02] border border-white/10 p-6 rounded-2xl">
-            <h4 className="text-xs uppercase tracking-widest text-amber-400 font-sans font-bold mb-3">
-              The Transmission Narrative
-            </h4>
-            <p className="text-base text-stone-200 font-serif leading-relaxed italic">
-              "{relationship.narrative}"
-            </p>
+          {/* Narrative & Cultural Resonance */}
+          <div className="bg-white/[0.02] border border-white/10 p-6 rounded-2xl flex flex-col gap-4">
+            <div>
+              <h4 className="text-xs uppercase tracking-widest text-amber-400 font-sans font-bold mb-2">
+                Cross-Cultural Resonance & Dialogue
+              </h4>
+              <p className="text-base text-stone-200 font-serif leading-relaxed italic">
+                "{relationship.narrative}"
+              </p>
+            </div>
+
+            {/* Epistemic clarification box */}
+            <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/20 text-xs font-sans text-stone-300 leading-relaxed">
+              <div className="flex items-center gap-2 text-amber-400 font-semibold mb-1">
+                <span>🏛️</span>
+                <span>Art-Historical Clarification — Polygenesis vs. Linear Diffusion</span>
+              </div>
+              <p className="text-stone-400">
+                In ARTSCAPE, <em>"The Motif Travels"</em> represents the viewer&apos;s journey across human visual traditions. It does <strong>not</strong> imply that the starting artwork was the singular historical &ldquo;origin&rdquo; of the motif. Motifs often emerge <strong>polygenetically</strong> (simultaneously across independent civilizations observing the same natural fauna and flora) or through <strong>multi-directional trade corridors</strong> (Silk Road, maritime routes) where cultural dialogue was mutual and non-linear.
+              </p>
+            </div>
 
             {/* Evidence Badges */}
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               {relationship.evidence.map((ev, i) => (
                 <div
                   key={i}

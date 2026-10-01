@@ -38,7 +38,7 @@ export function HeroSection({ onExplore }: HeroSectionProps) {
 
         {/* Subtitle */}
         <p className="text-lg sm:text-xl md:text-2xl text-stone-300 max-w-2xl font-light leading-relaxed mb-10">
-          Follow the living creative DNA of an artwork from one human creator across centuries and continents to another.
+          Follow the living creative DNA of visual archetypes as they resonate across continents and centuries through Silk Road trade routes, parallel traditions, and shared human imagination.
         </p>
 
         {/* Call to action buttons */}
@@ -62,13 +62,13 @@ export function HeroSection({ onExplore }: HeroSectionProps) {
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-amber-400 font-serif text-lg mb-1">01. Step Inside</div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Isolate real human-painted motifs with precision spotlights and visual segmentation.
+              Isolate real human-painted motifs with precision spotlights and visual segmentation on authentic museum scans.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
             <div className="text-amber-400 font-serif text-lg mb-1">02. Cross Boundaries</div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Watch motifs fly across Persian gardens, Mughal courts, and Rajasthani folk scrolls.
+              Witness how motifs resonate across Mughal courts, Safavid Persia, Rajput traditions, Edo woodblock prints, and Dutch masters.
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
