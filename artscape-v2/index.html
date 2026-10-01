@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARTSCAPE — The Motif Travels</title>
+  <meta name="description" content="ARTSCAPE lets you follow the creative DNA of an artwork from one human creator to another. Powered by Gemini multimodal AI." />
+  <meta name="theme-color" content="#0a0a0f" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ═══ Navigation ═══════════════════════════════════════════ -->
+    <nav class="nav" id="main-nav" role="navigation" aria-label="Main navigation">
+      <div class="nav__logo">
+        <div class="nav__logo-icon">A</div>
+        <span class="nav__logo-text">Artscape</span>
+      </div>
+      <ul class="nav__links">
+        <li class="nav__link nav__link--active" data-screen="hero" id="nav-home">Home</li>
+        <li class="nav__link" data-screen="gallery" id="nav-gallery">Gallery</li>
+      </ul>
+    </nav>
+
+    <!-- ═══ Screen 1: Hero / Landing ═════════════════════════════ -->
+    <section class="screen screen--active hero" id="screen-hero" aria-label="Welcome">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Gemini-Powered Art Discovery
+      </div>
+
+      <h1 class="hero__title">
+        <em>The Motif</em><br />Travels
+      </h1>
+
+      <p class="hero__tagline">
+        Follow the creative DNA of an artwork from one human creator to another.
+      </p>
+
+      <button class="hero__cta" id="hero-cta" aria-label="Explore the gallery">
+        <span>Explore the Gallery</span>
+        <span class="hero__cta-arrow">→</span>
+      </button>
+
+      <div class="hero__scroll-hint" id="hero-scroll-hint">
+        <span>Scroll to explore</span>
+        <div class="hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ═══ Screen 2: Gallery ════════════════════════════════════ -->
+    <section class="screen gallery" id="screen-gallery" aria-label="Gallery">
+      <header class="gallery__header">
+        <p class="gallery__label">The Collection</p>
+        <h2 class="gallery__title">Explore the relationships inside human-made art</h2>
+        <p class="gallery__subtitle">
+          Select an artwork to step inside. Discover meaningful visual elements,
+          then follow them as they travel to other works across cultures and centuries.
+        </p>
+      </header>
+
+      <div class="gallery__grid" id="gallery-grid">
+        <!-- Artwork cards rendered by JS -->
+        <div class="loader">
+          <div class="loader__spinner"></div>
+          <span class="loader__text">Loading artworks…</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Screen 3: Artwork View (Step Inside) ═════════════════ -->
+    <div class="artwork-view" id="artwork-view" role="dialog" aria-label="Artwork detail view">
+      <header class="artwork-view__header">
+        <button class="artwork-view__back" onclick="closeArtworkView()" id="artwork-back-btn">
+          ← Gallery
+        </button>
+        <span class="artwork-view__artwork-title" id="artwork-view-title"></span>
+        <span class="artwork-view__hint">
+          <span class="artwork-view__hint-dot"></span>
+          Click elements to explore
+        </span>
+      </header>
+
+      <div class="artwork-view__body">
+        <div class="artwork-view__canvas-wrapper" id="artwork-canvas">
+          <div class="artwork-view__canvas">
+            <img
+              class="artwork-view__main-image"
+              id="artwork-main-image"
+              src=""
+              alt=""
+            />
+            <!-- Element overlays rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Element detail panel (slides in from right) -->
+        <div class="element-panel" id="element-panel">
+          <!-- Content rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Screen 5: Motif Travel Transition ════════════════════ -->
+    <div class="motif-travel" id="motif-travel" role="dialog" aria-label="Motif travel animation">
+      <!-- Content rendered by JS during transition -->
+    </div>
+
+    <!-- ═══ Screen 6: Relationship View ══════════════════════════ -->
+    <div class="relationship-view" id="relationship-view" role="dialog" aria-label="Relationship details">
+      <!-- Content rendered by JS -->
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
