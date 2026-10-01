@@ -1,6 +1,6 @@
 # Guided storytelling
 
-Guided stories are available for the ten artworks in the current V2 collection on `/` and `/v2`. All ten are existing public-domain museum reproductions; see [ARTWORK_SOURCES.md](./ARTWORK_SOURCES.md) for the selected files and records. This change adds guided looking, not a chat interface. The proposed Yakshagana demo still requires an appropriately licensed image, catalog record, and accurate regions.
+Guided stories are available for all thirteen artworks in the current V2 collection on `/` and `/v2`. The original ten museum works remain, alongside a credited Yakshagana performance photograph and two Durga museum works. See [ARTWORK_SOURCES.md](./ARTWORK_SOURCES.md) for the selected files, licence terms, and source limitations. Every addition has three selectable regions, a prepared story, and provisional visual travel connections. This is guided looking, not a chat interface.
 
 ## Using a story
 
@@ -10,7 +10,9 @@ Guided stories are available for the ten artworks in the current V2 collection o
 4. **Explore this detail** interrupts the story and opens the existing information/relationship drawer. Choosing another detail directly also interrupts the story.
 5. **Skip story and explore freely**, closing the panel, or changing artworks stops the story and pending requests. **Replay story** reuses the loaded story.
 
-The artwork remains visible above the story on small screens and beside it on larger screens. Whole-scene and closing beats remove the detail mask.
+The artwork remains visible above the story on small screens and beside it on larger screens. Whole-scene and closing beats remove the detail mask. Opening **Cultural context & evidence** also pauses playback; its labels and citations remain separate from the prepared or generated narration.
+
+Photographic sources use the `source_record` reference rather than `museum_record`, and the interface links to the photograph's actual source. The photograph's credit and CC BY-SA 4.0 licence are available in the story panel. The exact cultural venue, production, and performers are not inferred from the image.
 
 ## Gemini configuration
 
@@ -46,4 +48,4 @@ If the provider fails, the UI labels the result as **Prepared story**, never as 
 
 ## Verification
 
-Automated tests cover schema constraints, grounding references, cache invalidation, request coalescing, model/provider restrictions, blocked legacy transport, API boundaries, playback, replay, cancellation, and offline guides. Browser checks should cover both `/` and `/v2`, all ten artworks, matching masks, manual detail selection, relationship travel, mobile panels, and provider failures.
+Automated tests cover schema constraints, grounding references, cache invalidation, request coalescing, model/provider restrictions, blocked legacy transport, API boundaries, playback, replay, cancellation, and offline guides. Browser checks should cover both `/` and `/v2`, all thirteen artworks, matching masks, manual detail selection, relationship travel, mobile panels, and provider failures.

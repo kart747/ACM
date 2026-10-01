@@ -2,6 +2,9 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import type { ArtworkData, ElementData } from './types';
+import { CulturalEvidence } from './CulturalEvidence';
+import { ImageCredit } from './ImageCredit';
+import { SourceRecord } from './SourceRecord';
 
 interface ImmersiveStageProps {
   artwork: ArtworkData;
@@ -44,15 +47,22 @@ export function ImmersiveStage(props: ImmersiveStageProps) {
 
       <ArtworkCanvas key={`${artwork.id}:${artwork.image}`} {...props} onImageStatusChange={setImageReady} />
 
+      {artwork.imageCredit && (
+        <div className="mx-auto max-w-3xl px-6 pb-4">
+          <ImageCredit credit={artwork.imageCredit} photograph={artwork.sourceKind === 'photograph'} />
+        </div>
+      )}
+      <div className="mx-auto max-w-3xl px-6">
+        <CulturalEvidence key={artwork.id} claims={artwork.culturalClaims} />
+      </div>
       <details className="mx-auto max-w-3xl px-6 py-4 text-sm text-stone-300">
         <summary className="cursor-pointer text-amber-300">About this artwork and its source</summary>
         <p className="mt-3 text-xs text-stone-400">{artwork.sourceType === 'ai_inferred' ? 'AI-assisted visual description · unverified interpretation' : artwork.sourceType === 'artist_declared' ? 'Artist-declared description' : 'Externally sourced description'}</p>
         <p className="mt-2 leading-relaxed">{artwork.description}</p>
         <p className="mt-3 text-xs text-stone-400">Catalog medium: {artwork.medium}</p>
         <p className="mt-2 text-xs text-stone-400">{artwork.rights}</p>
-        {'sourceUrl' in artwork && typeof artwork.sourceUrl === 'string' ? (
-          <a href={artwork.sourceUrl} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-amber-300 underline">{artwork.source}</a>
-        ) : <p className="mt-2 text-xs text-stone-400">{artwork.source}</p>}
+        <p className="mt-2 text-xs text-stone-400">{artwork.source}</p>
+        <div className="mt-2"><SourceRecord artwork={artwork} /></div>
       </details>
     </div>
   );

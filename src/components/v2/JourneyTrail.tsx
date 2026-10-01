@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { JourneyHop } from './types';
+import { ImageCredit } from './ImageCredit';
 
 interface JourneyTrailProps {
   hops: JourneyHop[];
@@ -23,24 +24,27 @@ export function JourneyTrail({ hops, onSelectHop, onClearTrail }: JourneyTrailPr
         {hops.map((hop, i) => (
           <React.Fragment key={`${hop.artwork.id}-${i}`}>
             {i > 0 && <span className="text-amber-500 text-xs shrink-0">──▶</span>}
-            <button
-              onClick={() => onSelectHop(hop)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-amber-400/20 hover:border-amber-400/50 border border-white/10 shrink-0 text-left transition-colors group"
-            >
-              <img
-                src={hop.artwork.image.startsWith('/') ? hop.artwork.image : `/${hop.artwork.image}`}
-                alt={hop.artwork.title}
-                className="w-5 h-5 rounded-full object-cover border border-white/20"
-              />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-serif text-white group-hover:text-amber-200 truncate max-w-[130px]">
-                  {hop.artwork.title}
+            <div className="shrink-0 space-y-1">
+              <button
+                onClick={() => onSelectHop(hop)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-amber-400/20 hover:border-amber-400/50 border border-white/10 shrink-0 text-left transition-colors group"
+              >
+                <img
+                  src={hop.artwork.image.startsWith('/') ? hop.artwork.image : `/${hop.artwork.image}`}
+                  alt={hop.artwork.title}
+                  className="w-5 h-5 rounded object-contain border border-white/20"
+                />
+                <span className="flex flex-col">
+                  <span className="text-[11px] font-serif text-white group-hover:text-amber-200 truncate max-w-[130px]">
+                    {hop.artwork.title}
+                  </span>
+                  <span className="text-[9px] font-sans text-stone-400">
+                    {hop.artwork.year}
+                  </span>
                 </span>
-                <span className="text-[9px] font-sans text-stone-400">
-                  {hop.artwork.year}
-                </span>
-              </div>
-            </button>
+              </button>
+              <ImageCredit credit={hop.artwork.imageCredit} photograph={hop.artwork.sourceKind === 'photograph'} compact />
+            </div>
           </React.Fragment>
         ))}
       </div>

@@ -17,17 +17,17 @@ Open <http://localhost:3000>.
 
 | Route | Experience |
 | --- | --- |
-| `/` | Current ten-artwork gallery, detail exploration, comparisons, and guided stories |
+| `/` | Current thirteen-artwork gallery, detail exploration, comparisons, and guided stories |
 | `/v2` | Alias of the current experience; reuses the same page implementation |
 | `/classic` | Original five-artwork journey with rectangle-based hotspots and optional SAM segmentation |
 
-## The ten artworks
+## The thirteen artworks
 
-All ten gallery images are existing local reproductions of human-made works from The Metropolitan Museum of Art. Their catalog records identify the images as public domain. No AI-generated images are used in this collection.
+The gallery retains its original ten museum works and adds a sourced Yakshagana performance photograph, a Durga sandstone sculpture, and a Durga painting. The twelve Met reproductions are public domain; the photograph is credited to Krishnamoorthy Sudhakar under CC BY-SA 4.0. Source and licence links accompany it. No AI-generated or artistically filtered images are used in this collection.
 
 The collection includes works by Manohar, Habiballah of Sava, Utagawa Hiroshige, an unnamed artist depicting Krishna and the gopis, Melchior d’ Hondecoeter, Katsushika Hokusai, Winslow Homer, Gerard David, Rembrandt, and Johannes Vermeer.
 
-See [ARTWORK_SOURCES.md](./ARTWORK_SOURCES.md) for the titles, museum records, and local image paths. The current collection has 24 selectable detail regions and 20 directed visual comparisons. Regions are hand-drawn guides, not pixel-perfect object cutouts.
+See [ARTWORK_SOURCES.md](./ARTWORK_SOURCES.md) for the titles, museum records, and local image paths. The current collection has 33 selectable detail regions and 30 directed visual comparisons. Regions are hand-drawn guides, not pixel-perfect object cutouts.
 
 The classic collection independently uses the five works by Hokusai, Homer, David, Vermeer, and Rembrandt. It shares their image files with the current gallery.
 
@@ -52,6 +52,8 @@ See [STORYTELLING.md](./STORYTELLING.md) for configuration, controls, validation
 Museum titles, creators, dates, and other catalog facts cite the museum records. Visual descriptions, prepared narration, and proposed connections remain interpretations. The interface distinguishes these from externally verified metadata.
 
 A comparison explains what is visible and what the pairing does not establish. No current content qualifies as an artist-declared interpretation. Model confidence or agreement is not historical verification.
+
+The three cultural additions expose claim-level evidence and citations in the gallery, detail panels, stories, and comparisons. Labels distinguish verified records, documented sources, unverified claims, interpretations, and questions needing community review. The photograph's subject identification is uploader-stated; venue, troupe, performers, costume designers, and specific performance narrative remain unverified. Its licence does not establish performer consent or community endorsement. All travel comparisons remain provisional, including those between works with a shared named subject.
 
 ## Commands
 
@@ -83,7 +85,8 @@ src/
     HotspotTuner.tsx          classic development-only rectangle editor
   data/
     artworks-v2.ts           current corpus and original five records
-    artworks-v2-extension.ts five additional records and comparisons
+    artworks-v2-extension.ts five additional museum records and comparisons
+    artworks-v2-cultural.ts  three cultural works, credits, evidence, and comparisons
     artworks.ts              independent classic collection
     collection.ts            classic loader with validated generated-data fallback
     generated/index.ts       stored classic CreativeDNA document list
@@ -95,7 +98,7 @@ src/
     segmentation/            classic browser-side SAM segmentation
 public/
   assets/artworks/           first five gallery reproductions
-  artworks/                  five reproductions shared with classic mode
+  artworks/                  five classic reproductions and three cultural additions
 ```
 
 ## Classic controls and segmentation

@@ -1,6 +1,7 @@
 import { StorySchema, type Story } from '@/lib/creative-dna/schema';
 import type { V2Artwork, V2Element } from '@/data/artworks-v2';
 import { lintText } from '@/lib/hedging/rules';
+import { sourceRecordRef } from '@/lib/artwork-sources';
 
 export { StorySchema, StoryBeatSchema } from '@/lib/creative-dna/schema';
 export type { Story, StoryBeat } from '@/lib/creative-dna/schema';
@@ -27,7 +28,7 @@ export function validateStory(value: unknown, artwork: V2Artwork, elements: V2El
   const ids = new Set(elements.map(element => element.id));
   for (const beat of story.beats) {
     if (beat.element_id && !ids.has(beat.element_id)) return null;
-    if (beat.source_refs.some(ref => ref !== 'museum_record' && !ids.has(ref))) return null;
+    if (beat.source_refs.some(ref => ref !== sourceRecordRef(artwork) && !ids.has(ref))) return null;
     if (generated && beat.source_type !== 'ai_inferred') return null;
   }
   const invitation = story.beats.at(-1)!;

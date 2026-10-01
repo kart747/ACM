@@ -1,10 +1,12 @@
 import { ADDITIONAL_ARTWORKS, ADDITIONAL_ELEMENTS, ADDITIONAL_RELATIONSHIPS } from './artworks-v2-extension';
+import type { CulturalClaim, ImageCredit } from '@/lib/artwork-sources';
+import { CULTURAL_ARTWORKS, CULTURAL_ELEMENTS, CULTURAL_RELATIONSHIPS } from './artworks-v2-cultural';
 
 /**
  * ARTSCAPE V2 — Corpus & CreativeDNA Data Layer
  *
- * Catalog metadata is supported by each artwork's Met sourceUrl.
- * Visual descriptions, curated regions, and comparisons are AI interpretations.
+ * Catalog metadata cites museum records or the credited photograph source.
+ * Cultural claims retain their evidence tiers; visual readings are interpretations.
  */
 
 export interface V2Artwork {
@@ -17,6 +19,9 @@ export interface V2Artwork {
   region: string;
   source: string;
   sourceUrl: string;
+  sourceKind?: 'museum' | 'photograph';
+  imageCredit?: ImageCredit;
+  culturalClaims?: CulturalClaim[];
   rights: string;
   image: string;
   description: string;
@@ -51,6 +56,7 @@ export interface V2Relationship {
   evidence: { type: string; description: string }[];
   agreement: string;
   status: 'verified' | 'candidate';
+  culturalClaims?: CulturalClaim[];
   narrative: string;
 }
 
@@ -135,7 +141,8 @@ export const V2_ARTWORKS: V2Artwork[] = [
     artistStatement: null,
     sourceType: "ai_inferred"
   },
-  ...ADDITIONAL_ARTWORKS
+  ...ADDITIONAL_ARTWORKS,
+  ...CULTURAL_ARTWORKS
 ];
 
 // Coordinates include the full local image and its margins; these are curated detail regions, not segmentation masks.
@@ -390,7 +397,8 @@ export const V2_ELEMENTS: Record<string, V2Element[]> = {
       tradition: "A visible plumage pattern in this oil painting; a transmission from manuscript decoration is not established."
     }
   ],
-  ...ADDITIONAL_ELEMENTS
+  ...ADDITIONAL_ELEMENTS,
+  ...CULTURAL_ELEMENTS
 };
 
 export const V2_RELATIONSHIPS: V2Relationship[] = [
@@ -484,5 +492,6 @@ export const V2_RELATIONSHIPS: V2Relationship[] = [
     status: "candidate",
     narrative: "A bird that is easy to miss above Krishna becomes a dominant presence in Peacocks. Compare the small curved neck and narrow tail in the tree with the large blue neck, patterned wing, and descending train on the ledge. The contrast concerns visible scale and emphasis; it does not document cultural exchange or the artist's intention."
   },
-  ...ADDITIONAL_RELATIONSHIPS
+  ...ADDITIONAL_RELATIONSHIPS,
+  ...CULTURAL_RELATIONSHIPS
 ];

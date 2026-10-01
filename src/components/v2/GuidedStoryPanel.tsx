@@ -2,6 +2,9 @@
 
 import type { ArtworkData } from './types';
 import type { GuidedStoryController } from './useGuidedStory';
+import { CulturalEvidence } from './CulturalEvidence';
+import { SourceRecord } from './SourceRecord';
+import { ImageCredit } from './ImageCredit';
 
 interface GuidedStoryPanelProps {
   artwork: ArtworkData;
@@ -65,7 +68,11 @@ export function GuidedStoryPanel({ artwork, controller: tour, onExploreDetail }:
                 )}
               </div>
             )}
-            <a href={artwork.sourceUrl} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs text-stone-400 underline">Read the museum record ↗</a>
+            <div className="mt-5 space-y-3">
+              <SourceRecord artwork={artwork} read />
+              <ImageCredit credit={artwork.imageCredit} photograph={artwork.sourceKind === 'photograph'} />
+            </div>
+            <CulturalEvidence key={artwork.id} claims={artwork.culturalClaims} onExpand={tour.pause} />
             <p className="mt-2 text-xs leading-relaxed text-stone-500">Visual interpretations are not artist statements or proof of historical influence.</p>
             {prepared && (
               <div className="mt-5 border-t border-white/10 pt-4">

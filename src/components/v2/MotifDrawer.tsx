@@ -3,8 +3,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ElementData, RelationshipData, ArtworkData } from './types';
+import { CulturalEvidence } from './CulturalEvidence';
+import { ImageCredit } from './ImageCredit';
+import { SourceRecord } from './SourceRecord';
 
 interface MotifDrawerProps {
+  artwork?: ArtworkData;
   element: ElementData | null;
   relationships: RelationshipData[];
   loading?: boolean;
@@ -14,6 +18,7 @@ interface MotifDrawerProps {
 }
 
 export function MotifDrawer({
+  artwork,
   element,
   relationships,
   loading = false,
@@ -79,6 +84,14 @@ export function MotifDrawer({
             <p className="text-sm text-stone-200 font-serif leading-relaxed bg-black/30 p-4 rounded-xl border border-white/5">
               {element.meaning.text}
             </p>
+            <p className="mt-2 text-xs leading-relaxed text-stone-400">A selected region is a visual guide, not evidence of a character identity, ritual role, or symbolic meaning. Artwork sources support only the claims they document.</p>
+            {artwork && (
+              <div className="mt-3 space-y-3">
+                <SourceRecord artwork={artwork} />
+                <ImageCredit credit={artwork.imageCredit} photograph={artwork.sourceKind === 'photograph'} />
+                <CulturalEvidence key={artwork.id} claims={artwork.culturalClaims} />
+              </div>
+            )}
           </div>
 
           {/* Technique & Materials */}
@@ -135,7 +148,7 @@ export function MotifDrawer({
                           <img
                             src={targetArt.image.startsWith('/') ? targetArt.image : `/${targetArt.image}`}
                             alt={targetArt.title}
-                            className="w-12 h-12 rounded-lg object-cover border border-white/10"
+                            className="w-12 h-12 rounded-lg object-contain border border-white/10"
                           />
                         )}
                         <div className="flex-1 min-w-0">
@@ -147,6 +160,8 @@ export function MotifDrawer({
                           </p>
                         </div>
                       </div>
+
+                      {targetArt && <ImageCredit credit={targetArt.imageCredit} photograph={targetArt.sourceKind === 'photograph'} compact />}
 
                       <p className="text-xs text-stone-300 font-serif line-clamp-2 leading-relaxed italic">
                         "{rel.narrative}"

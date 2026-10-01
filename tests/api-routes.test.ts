@@ -42,7 +42,7 @@ describe('Next.js API Route Handlers', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBe(10);
+    expect(data.length).toBe(13);
     expect(data[0].id).toBe('art_001');
     expect(data).toEqual(V2_ARTWORKS);
   });

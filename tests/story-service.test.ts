@@ -92,6 +92,31 @@ describe('story service', () => {
     expect(await service.get(artwork.id)).toMatchObject({ source: 'cache', artworkId: artwork.id });
   });
 
+  it('keeps photograph evidence and exact image bytes distinct from museum records', async () => {
+    const artwork = V2_ARTWORKS.find(item => item.id === 'art_011')!;
+    transport.request.mockResolvedValue(output(artwork.id));
+    const result = await service.generate(artwork.id);
+    expect(result).toMatchObject({ source: 'gemini', artworkId: artwork.id });
+    expect(result?.story.beats[0].source_refs).toEqual(['source_record']);
+    const request = transport.request.mock.calls[0][0];
+    const bytes = await readFile(path.join(process.cwd(), 'public', artwork.image.replace(/^\//, '')));
+    expect(request.imageDataUrl).toBe(`data:image/jpeg;base64,${bytes.toString('base64')}`);
+    expect(request.prompt).toContain('"source_record"');
+    expect(request.prompt).not.toContain('"museum_record"');
+    expect(request.prompt).toContain('community_review');
+    expect(request.prompt).toContain(artwork.imageCredit!.licenseUrl);
+    expect(await service.get(artwork.id)).toMatchObject({ source: 'cache' });
+  });
+
+  it('rejects generated photograph stories falsely citing a museum record', async () => {
+    const story = output('art_011');
+    story.beats[0].source_refs = ['museum_record'];
+    transport.request.mockResolvedValue(story);
+    const result = await service.generate('art_011');
+    expect(result).toMatchObject({ source: 'prepared', reason: 'invalid_response' });
+    expect(result?.story.beats[0].source_refs).toEqual(['source_record']);
+  });
+
   it.each(['../.env.local', 'https://example.com/image.jpg', '/artworks/../../.env.local'])('rejects a corpus path outside the artwork directories: %s', async image => {
     const original = V2_ARTWORKS[0].image;
     try {

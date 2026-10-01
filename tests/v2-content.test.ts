@@ -15,24 +15,26 @@ const records = [
   ['art_008', '436104', '1982.60.17'],
   ['art_009', '437397', '14.40.618'],
   ['art_010', '437881', '89.15.21'],
+  ['art_012', '38418', '33.65.2'],
+  ['art_013', '73169', '2005.436.2'],
 ];
 
 describe('V2 sourced artwork data', () => {
-  it('contains ten distinct public-domain museum works with local images', () => {
-    expect(V2_ARTWORKS).toHaveLength(10);
-    expect(new Set(V2_ARTWORKS.map(art => art.id)).size).toBe(10);
-    expect(new Set(V2_ARTWORKS.map(art => art.sourceUrl)).size).toBe(10);
+  it('contains thirteen distinct sourced works with local images and record-specific rights', () => {
+    expect(V2_ARTWORKS).toHaveLength(13);
+    expect(new Set(V2_ARTWORKS.map(art => art.id)).size).toBe(13);
+    expect(new Set(V2_ARTWORKS.map(art => art.sourceUrl)).size).toBe(13);
     const hashes = V2_ARTWORKS.map(art => {
-      expect(art.rights).toMatch(/public domain/i);
+      expect(art.rights).toMatch(art.sourceKind === 'photograph' ? /CC BY-SA 4\.0/ : /public domain|CC0/i);
       const filename = path.join(process.cwd(), 'public', art.image.replace(/^\//, ''));
       const bytes = readFileSync(filename);
       expect([...bytes.subarray(0, 3)]).toEqual([255, 216, 255]);
       return createHash('sha256').update(bytes).digest('hex');
     });
-    expect(new Set(hashes).size).toBe(10);
+    expect(new Set(hashes).size).toBe(13);
   });
 
-  it('connects all ten artworks to the first work through visible comparisons', () => {
+  it('connects all thirteen artworks to the first work through visible comparisons', () => {
     const reached = new Set([V2_ARTWORKS[0].id]);
     const queue = [V2_ARTWORKS[0].id];
     while (queue.length) {

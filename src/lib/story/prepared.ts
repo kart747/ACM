@@ -1,15 +1,16 @@
 import type { V2Artwork, V2Element } from '@/data/artworks-v2';
 import { StorySchema, type Story } from '@/lib/creative-dna/schema';
+import { sourceRecordRef } from '@/lib/artwork-sources';
 
 export function prepareStory(artwork: V2Artwork, elements: V2Element[]): Story {
   return StorySchema.parse({
-    intro: `Take a closer look at ${artwork.title}. This prepared guide follows the catalog and curated visual observations.`,
+    intro: `Take a closer look at ${artwork.title}. This prepared guide follows the source record and curated visual observations.`,
     beats: [
       {
         id: 'scene', element_id: null, title: 'Begin with the whole scene',
         short_text: 'Let your eyes move across the image before focusing on a detail.',
         explanation: artwork.description,
-        duration: 12, source_type: 'ai_inferred', source_refs: ['museum_record'],
+        duration: 12, source_type: 'ai_inferred', source_refs: [sourceRecordRef(artwork)],
       },
       ...elements.slice(0, 3).map((element, index) => ({
         id: `detail_${index + 1}`, element_id: element.id, title: element.label,

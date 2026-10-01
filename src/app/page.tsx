@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Navbar } from '@/components/v2/Navbar';
 import { HeroSection } from '@/components/v2/HeroSection';
+import { CreativeDnaExplainer } from '@/components/v2/CreativeDnaExplainer';
 import { GalleryView } from '@/components/v2/GalleryView';
 import { ImmersiveStage } from '@/components/v2/ImmersiveStage';
 import { MotifDrawer } from '@/components/v2/MotifDrawer';
@@ -38,7 +39,11 @@ export default function Page() {
     : null;
 
   useEffect(() => {
-    if (currentScreen === 'stage' && (selection.elementId || tour.active) && window.matchMedia?.('(max-width: 1023px)').matches) {
+    if (currentScreen === 'hero' && window.location.hash === '#concept') {
+      const concept = document.getElementById('concept');
+      concept?.focus({ preventScroll: true });
+      concept?.scrollIntoView({ block: 'start' });
+    } else if (currentScreen === 'stage' && (selection.elementId || tour.active) && window.matchMedia?.('(max-width: 1023px)').matches) {
       document.querySelector('[data-artwork-canvas]')?.scrollIntoView({ block: 'start', behavior: 'instant' });
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -53,10 +58,14 @@ export default function Page() {
   };
   const openInspector = () => { tour.pause(); setInspectorOpen(true); };
   const navigate = (screen: 'hero' | 'gallery' | 'stage') => {
+    if (window.location.hash === '#concept') {
+      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+    }
     tour.stop();
     clearElement();
     setActiveTravelRel(null);
     setCurrentScreen(screen);
+    if (screen === currentScreen && screen !== 'stage') window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const visitArtwork = (artwork: ArtworkData, element?: ElementData, record = true) => {
     tour.stop();
@@ -82,6 +91,7 @@ export default function Page() {
         {currentScreen === 'hero' && (
           <>
             <HeroSection onExplore={() => navigate('gallery')} />
+            <CreativeDnaExplainer onExplore={() => navigate('gallery')} />
             <GalleryView artworks={artworks} onSelectArtwork={artwork => visitArtwork(artwork)} />
           </>
         )}
@@ -108,6 +118,7 @@ export default function Page() {
       </main>
       <GuidedStoryPanel artwork={selectedArtwork} controller={tour} onExploreDetail={() => { if (tour.focusedElement) selectElement(tour.focusedElement); }} />
       <MotifDrawer
+        artwork={selectedArtwork}
         element={currentScreen === 'stage' && !activeTravelRel && !tour.active ? selectedElement : null}
         relationships={relationships}
         allArtworks={artworks}

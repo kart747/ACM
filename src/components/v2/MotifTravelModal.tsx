@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import type { RelationshipData, ArtworkData, ElementData } from './types';
+import { CulturalEvidence } from './CulturalEvidence';
+import { ImageCredit } from './ImageCredit';
+import { SourceRecord } from './SourceRecord';
 
 const assessmentSchema = z.object({
   assessmentStatus: z.enum(['complete', 'curated_fallback']),
@@ -166,6 +169,9 @@ export function MotifTravelModal({
                   </div>
                 )}
               </div>
+              <SourceRecord artwork={sourceArtwork} />
+              <ImageCredit credit={sourceArtwork.imageCredit} photograph={sourceArtwork.sourceKind === 'photograph'} />
+              <CulturalEvidence key={sourceArtwork.id} claims={sourceArtwork.culturalClaims} title="Source artwork: cultural context & evidence" />
             </div>
 
             {/* Target Card */}
@@ -196,6 +202,9 @@ export function MotifTravelModal({
                   </div>
                 )}
               </div>
+              <SourceRecord artwork={targetArtwork} />
+              <ImageCredit credit={targetArtwork.imageCredit} photograph={targetArtwork.sourceKind === 'photograph'} />
+              <CulturalEvidence key={targetArtwork.id} claims={targetArtwork.culturalClaims} title="Target artwork: cultural context & evidence" />
             </div>
           </div>
 
@@ -219,6 +228,8 @@ export function MotifTravelModal({
                 These notes compare selected motifs. Similarity alone does not establish shared origins, historical contact, influence, or transmission between these works.
               </p>
             </div>
+
+            <CulturalEvidence key={relationship.id} claims={relationship.culturalClaims} title="Comparison: cultural context & evidence" />
 
             {/* Evidence Badges */}
             <div className="flex flex-wrap gap-2 pt-2">
