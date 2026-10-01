@@ -25,14 +25,39 @@ const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
 // ═══════════════════════════════════════════════════════════════════
-// Initialization
+// Initialization & Backend Connectivity
 // ═══════════════════════════════════════════════════════════════════
+async function checkBackendConnection() {
+  const statusEl = $('#nav-backend-status');
+  if (!statusEl) return;
+  const dot = statusEl.querySelector('.nav__status-dot');
+  const text = statusEl.querySelector('.nav__status-text');
+
+  const health = await ArtscapeAPI.checkHealth();
+  if (health.connected) {
+    statusEl.classList.remove('nav__status--offline');
+    statusEl.classList.add('nav__status--connected');
+    if (dot) dot.style.backgroundColor = '#10b981';
+    if (text) text.textContent = health.gemini?.configured ? 'Gemini API Live' : 'Backend Connected';
+    statusEl.title = `Connected to Next.js API (${health.gemini?.mode || 'live'})`;
+  } else {
+    statusEl.classList.remove('nav__status--connected');
+    statusEl.classList.add('nav__status--offline');
+    if (dot) dot.style.backgroundColor = '#f59e0b';
+    if (text) text.textContent = 'Local CreativeDNA';
+    statusEl.title = 'Next.js backend unreachable, using local CreativeDNA corpus';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initParticles();
   initNavScroll();
   initRevealAnimations();
 
-  // Load artworks
+  // Check live backend connection asynchronously
+  checkBackendConnection();
+
+  // Load artworks (from live Next.js API with fallback)
   AppState.artworks = await ArtscapeAPI.getArtworks();
   renderGallery();
 
