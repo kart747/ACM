@@ -31,7 +31,7 @@ beforeAll(() => {
 afterEach(cleanup);
 
 async function renderPage() {
-  const { default: Page } = await import('@/app/page');
+  const { default: Page } = await import('@/app/classic/page');
   render(<Page />);
 }
 

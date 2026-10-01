@@ -10,12 +10,14 @@ import { GET as getHealth } from '@/app/api/health/route';
 import { NextRequest } from 'next/server';
 
 function makeRequest(url: string, method = 'GET', body?: unknown): NextRequest {
-  const init: RequestInit = { method };
   if (body) {
-    init.body = JSON.stringify(body);
-    init.headers = { 'Content-Type': 'application/json' };
+    return new NextRequest(new URL(url, 'http://localhost:3000'), {
+      method,
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
-  return new NextRequest(new URL(url, 'http://localhost:3000'), init);
+  return new NextRequest(new URL(url, 'http://localhost:3000'), { method });
 }
 
 describe('Next.js API Route Handlers', () => {

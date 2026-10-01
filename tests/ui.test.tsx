@@ -37,7 +37,7 @@ beforeAll(() => {
 afterEach(cleanup);
 
 async function renderPage({ enter = true } = {}) {
-  const { default: Page } = await import('@/app/page');
+  const { default: Page } = await import('@/app/classic/page');
   const view = render(<Page />);
   if (enter) {
     fireEvent.click(screen.getByRole('button', { name: /Step Inside/ }));
